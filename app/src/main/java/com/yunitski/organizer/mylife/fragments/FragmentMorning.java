@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -14,6 +16,8 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.yunitski.organizer.mylife.R;
 import com.yunitski.organizer.mylife.activities.MainActivity;
 import com.yunitski.organizer.mylife.adapters.MorningItemAdapter;
@@ -24,6 +28,7 @@ import com.yunitski.organizer.mylife.itemClasses.MorningItem;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class FragmentMorning extends Fragment {
 
@@ -64,10 +69,24 @@ public class FragmentMorning extends Fragment {
         adapter.setOnMorningClickListener(new MorningItemAdapter.OnMorningItemClickListener() {
             @Override
             public void onMorningItemClick(int position) {
-                Toast.makeText(getContext(), "more " + position, Toast.LENGTH_SHORT).show();
+                showBottomSheetDialog(morningItems.get(position).getMorningItemText());
             }
         });
 
+    }
+
+    private void showBottomSheetDialog(String name) {
+
+        final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext());
+        bottomSheetDialog.setContentView(R.layout.bottom_sheet);
+        LinearLayout done = bottomSheetDialog.findViewById(R.id.doneLL);
+        LinearLayout edit = bottomSheetDialog.findViewById(R.id.editLL);
+        LinearLayout delete = bottomSheetDialog.findViewById(R.id.deleteLL);
+        TextView itemNameTextView = bottomSheetDialog.findViewById(R.id.itemNameTextView);
+        assert itemNameTextView != null;
+        itemNameTextView.setText(name);
+
+        bottomSheetDialog.show();
     }
 
 }
