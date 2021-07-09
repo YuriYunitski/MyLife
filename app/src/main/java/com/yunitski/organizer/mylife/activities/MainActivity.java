@@ -94,15 +94,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.fabMorning){
-            launchDialog(InputData.TaskEntry.COLUMN_MORNING_TASK, InputData.TaskEntry.COLUMN_MORNING_TASK_TIME, InputData.TaskEntry.MORNING_TABLE);
+            launchDialog(InputData.TaskEntry.COLUMN_MORNING_TASK, InputData.TaskEntry.COLUMN_MORNING_TASK_TIME, InputData.TaskEntry.COLUMN_MORNING_TASK_STATUS, InputData.TaskEntry.MORNING_TABLE);
         } else if (v.getId() == R.id.fabDay){
-            launchDialog(InputData.TaskEntry.COLUMN_DAY_TASK, InputData.TaskEntry.COLUMN_DAY_TASK_TIME, InputData.TaskEntry.DAY_TABLE);
+            launchDialog(InputData.TaskEntry.COLUMN_DAY_TASK, InputData.TaskEntry.COLUMN_DAY_TASK_TIME, InputData.TaskEntry.COLUMN_DAY_TASK_STATUS, InputData.TaskEntry.DAY_TABLE);
         } else if (v.getId() == R.id.fabEvening){
-            launchDialog(InputData.TaskEntry.COLUMN_EVENING_TASK, InputData.TaskEntry.COLUMN_EVENING_TASK_TIME, InputData.TaskEntry.EVENING_TABLE);
+            launchDialog(InputData.TaskEntry.COLUMN_EVENING_TASK, InputData.TaskEntry.COLUMN_EVENING_TASK_TIME, InputData.TaskEntry.COLUMN_EVENING_TASK_STATUS, InputData.TaskEntry.EVENING_TABLE);
         }
     }
 
-    private void launchDialog(String taskTextColumn, String taskTimeColumn, String table){
+    private void launchDialog(String taskTextColumn, String taskTimeColumn, String taskStatusColumn, String table){
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         LayoutInflater inflater = getLayoutInflater();
         View view = inflater.inflate(R.layout.task_picker_dialog, null);
@@ -126,6 +126,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         ContentValues values = new ContentValues();
                         values.put(taskTextColumn, taskEditText.getText().toString());
                         values.put(taskTimeColumn, time);
+                        values.put(taskStatusColumn, "wait");
                         SQLiteDatabase db = dbHelper.getWritableDatabase();
                         db.insert(table, null, values);
                         db.close();

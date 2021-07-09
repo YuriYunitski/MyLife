@@ -22,6 +22,8 @@ public class DbHelper extends SQLiteOpenHelper {
                 InputData.TaskEntry.COLUMN_MORNING_TASK +
                 " TEXT, " +
                 InputData.TaskEntry.COLUMN_MORNING_TASK_TIME +
+                " TEXT, " +
+                InputData.TaskEntry.COLUMN_MORNING_TASK_STATUS +
                 " TEXT);";
         db.execSQL(createTableMorning);
 
@@ -33,6 +35,8 @@ public class DbHelper extends SQLiteOpenHelper {
                 InputData.TaskEntry.COLUMN_DAY_TASK +
                 " TEXT, " +
                 InputData.TaskEntry.COLUMN_DAY_TASK_TIME +
+                " TEXT, " +
+                InputData.TaskEntry.COLUMN_DAY_TASK_STATUS +
                 " TEXT);";
         db.execSQL(createTableDay);
 
@@ -44,6 +48,8 @@ public class DbHelper extends SQLiteOpenHelper {
                 InputData.TaskEntry.COLUMN_EVENING_TASK +
                 " TEXT, " +
                 InputData.TaskEntry.COLUMN_EVENING_TASK_TIME +
+                " TEXT, " +
+                InputData.TaskEntry.COLUMN_EVENING_TASK_STATUS +
                 " TEXT);";
         db.execSQL(createTableEvening);
 

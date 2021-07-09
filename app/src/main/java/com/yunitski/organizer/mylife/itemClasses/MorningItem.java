@@ -2,16 +2,22 @@ package com.yunitski.organizer.mylife.itemClasses;
 
 public class MorningItem {
 
+    private String morningItemId;
+
     private String morningItemText;
 
     private String morningItemTime;
 
+    private String morningItemStatus;
+
     public MorningItem() {
     }
 
-    public MorningItem(String morningItemText, String morningItemTime) {
+    public MorningItem(String morningItemId, String morningItemText, String morningItemTime, String morningItemStatus) {
+        this.morningItemId = morningItemId;
         this.morningItemText = morningItemText;
         this.morningItemTime = morningItemTime;
+        this.morningItemStatus = morningItemStatus;
     }
 
     public String getMorningItemText() {
@@ -28,5 +34,21 @@ public class MorningItem {
 
     public void setMorningItemTime(String morningItemTime) {
         this.morningItemTime = morningItemTime;
+    }
+
+    public String getMorningItemStatus() {
+        return morningItemStatus;
+    }
+
+    public void setMorningItemStatus(String morningItemStatus) {
+        this.morningItemStatus = morningItemStatus;
+    }
+
+    public String getMorningItemId() {
+        return morningItemId;
+    }
+
+    public void setMorningItemId(String morningItemId) {
+        this.morningItemId = morningItemId;
     }
 }
