@@ -1,17 +1,24 @@
 package com.yunitski.organizer.mylife.fragments;
 
+import android.app.AlertDialog;
+import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -28,13 +35,17 @@ import com.yunitski.organizer.mylife.itemClasses.MorningItem;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 public class FragmentMorning extends Fragment implements View.OnClickListener {
 
     RecyclerView recyclerView;
     MorningItemAdapter adapter;
     ArrayList<MorningItem> morningItems;
+    String time;
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Nullable
     @org.jetbrains.annotations.Nullable
     @Override
@@ -47,6 +58,7 @@ public class FragmentMorning extends Fragment implements View.OnClickListener {
         return view;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     private void updateUI(){
         morningItems = new ArrayList<>();
 
@@ -59,7 +71,12 @@ public class FragmentMorning extends Fragment implements View.OnClickListener {
             int timeIndex = cursor.getColumnIndex(InputData.TaskEntry.COLUMN_MORNING_TASK_TIME);
             int statusIndex = cursor.getColumnIndex(InputData.TaskEntry.COLUMN_MORNING_TASK_STATUS);
 
-            morningItems.add(new MorningItem(cursor.getString(idIndex), cursor.getString(textIndex), cursor.getString(timeIndex), cursor.getString(statusIndex)));
+            if (cursor.getString(statusIndex).equals("wait")){
+                morningItems.add(new MorningItem(cursor.getString(idIndex), cursor.getString(textIndex), cursor.getString(timeIndex), cursor.getString(statusIndex)));
+            } else {
+                Toast.makeText(getContext(), "completed: " + cursor.getString(textIndex), Toast.LENGTH_SHORT).show();
+            }
+
         }
         db.close();
         cursor.close();
@@ -72,6 +89,7 @@ public class FragmentMorning extends Fragment implements View.OnClickListener {
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     private void showBottomSheetDialog(String name, int position) {
 
         final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext());
@@ -121,7 +139,67 @@ public class FragmentMorning extends Fragment implements View.OnClickListener {
         db.close();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     private void editTask(int position) {
+        String id = morningItems.get(position).getMorningItemId();
+        DbHelper dbHelper = new DbHelper(getContext());
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        LayoutInflater inflater = getLayoutInflater();
+        View view = inflater.inflate(R.layout.task_picker_dialog, null);
+        EditText taskEditText = view.findViewById(R.id.taskEditText);
+        TimePicker taskTimePicker = view.findViewById(R.id.taskTimePicker);
+        taskTimePicker.setIs24HourView(true);
+        taskEditText.setText(morningItems.get(position).getMorningItemText());
+        String t = morningItems.get(position).getMorningItemTime();
+        String[] s = t.split(":");
+        String h = s[0];
+        String m = s[1];
+        taskTimePicker.setHour(Integer.parseInt(h));
+        taskTimePicker.setMinute(Integer.parseInt(m));
+        time = taskTimePicker.getHour() + ":" + taskTimePicker.getMinute();
+        taskTimePicker.setOnTimeChangedListener((view1, hourOfDay, minute) -> {
+            String mi = "" + minute;
+            if (minute < 10){
+                mi = "0" + minute;
+            }
+            time = "" + hourOfDay + ":" + mi;
+        });
+        builder.setTitle("Change")
+                .setCancelable(false)
+                .setView(view)
+                .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (!taskEditText.getText().toString().isEmpty()){
+                            String strSQL = "UPDATE " +
+                                    InputData.TaskEntry.MORNING_TABLE +
+                                    " SET " +
+                                    InputData.TaskEntry.COLUMN_MORNING_TASK +
+                                    " = '" +
+                                    taskEditText.getText().toString() + "' ," +
+                                    InputData.TaskEntry.COLUMN_MORNING_TASK_TIME +
+                                    " = '" +
+                                    time +
+                                    "' WHERE " +
+                                    InputData.TaskEntry.COLUMN_ID +
+                                    " = " +
+                                    id +
+                                    ";";
+                            db.execSQL(strSQL);
+                            db.close();
+                            updateUI();
+                        }
+                    }
+                })
+                .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+        builder.create().show();
+
     }
 
     private void deleteTask(int position) {
@@ -133,6 +211,16 @@ public class FragmentMorning extends Fragment implements View.OnClickListener {
     }
 
 
+    private String timeCurrent(){
+        Calendar calendar = new GregorianCalendar();
+        int m = calendar.get(Calendar.MINUTE);
+        int h = calendar.get(Calendar.HOUR_OF_DAY);
+        String mm = "" + m;
+        if (m < 10){
+            mm = "0" + m;
+        }
+        return "" + h + ":" + mm;
+    }
 
     @Override
     public void onClick(View v) {
