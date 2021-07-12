@@ -5,16 +5,28 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
 
+import android.app.AlarmManager;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.CalendarView;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
@@ -22,25 +34,31 @@ import com.yunitski.organizer.mylife.R;
 import com.yunitski.organizer.mylife.adapters.SectionsPagerAdapter;
 import com.yunitski.organizer.mylife.dbhelper.DbHelper;
 import com.yunitski.organizer.mylife.dbhelper.InputData;
+import com.yunitski.organizer.mylife.receiver.AlarmReceiver;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    ViewPager viewPager;
-    TabLayout tabLayout;
-    FloatingActionButton fabMorning, fabDay, fabEvening;
-    String time, morningTaskText, morningTaskTime;
-    DbHelper dbHelper;
+    private ViewPager viewPager;
+    private TabLayout tabLayout;
+    private FloatingActionButton fabMorning, fabDay, fabEvening;
+    private String time, morningTaskText, morningTaskTime;
+    private DbHelper dbHelper;
     private FragmentRefreshListener fragmentRefreshListener;
     private FragmentRefreshListener1 fragmentRefreshListener1;
     private FragmentRefreshListener2 fragmentRefreshListener2;
 
-    TextView date;
+    private TextView date;
 
     public static final String DATE_FILE = "dateFile";
     public static final String DATE_KEY = "dateKey";
+
+    private ImageButton popupMenuImageButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +73,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         fabMorning = findViewById(R.id.fabMorning);
         fabDay = findViewById(R.id.fabDay);
         fabEvening = findViewById(R.id.fabEvening);
+        popupMenuImageButton = findViewById(R.id.popupMenuImageButton);
+        popupMenuImageButton.setOnClickListener(this);
         time = timeCurrent();
         date = findViewById(R.id.date);
         date.setText(dateCurrent());
@@ -96,6 +116,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             tab.select();
         }
         dbHelper = new DbHelper(this);
+        createNotificationChannel();
+    }
+
+    private void createNotificationChannel() {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            CharSequence name = "myLifeReminderChannel";
+            String description = "Channel for alarm Manager";
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+            NotificationChannel channel = new NotificationChannel("myLifeChannelId", name, importance);
+            channel.setDescription(description);
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
     }
 
     private void animateFab(int position) {
@@ -159,47 +193,46 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             calendar.set(Calendar.DAY_OF_MONTH, ddd);
             long milliTime = calendar.getTimeInMillis();
             datePicker.setDate(milliTime, true, true);
-            datePicker.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
-                @Override
-                public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
-                    String mon = "" + (month + 1);
-                    if (month < 10){
-                        mon = "0" + (month + 1);
-                    }
-                    String day = "" + dayOfMonth;
-                    if (dayOfMonth < 10){
-                        day = "0" + dayOfMonth;
-                    }
-                    String dd = "" + day + "." + mon + "." + year;
-                    chDate.setText(dd);
+            datePicker.setOnDateChangeListener((view1, year, month, dayOfMonth) -> {
+                String mon = "" + (month + 1);
+                if (month < 10){
+                    mon = "0" + (month + 1);
                 }
+                String day = "" + dayOfMonth;
+                if (dayOfMonth < 10){
+                    day = "0" + dayOfMonth;
+                }
+                String dd = "" + day + "." + mon + "." + year;
+                chDate.setText(dd);
             });
-            builder.setPositiveButton("ok", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    date.setText(chDate.getText().toString());
-//                    SharedPreferences sharedPreferences = getSharedPreferences(DATE_FILE, MODE_PRIVATE);
-//                    SharedPreferences.Editor editor = sharedPreferences.edit();
-//                    editor.putString(DATE_KEY, date.getText().toString());
-//                    editor.apply();
-
-                    if(getFragmentRefreshListener()!= null){
-                        getFragmentRefreshListener().onRefresh();
-                    }
-                    if(getFragmentRefreshListener1()!= null){
-                        getFragmentRefreshListener1().onRefresh();
-                    }
-                    if (getFragmentRefreshListener2() != null){
-                        getFragmentRefreshListener2().onRefresh();
-                    }
+            builder.setPositiveButton("ok", (dialog, which) -> {
+                date.setText(chDate.getText().toString());
+                if(getFragmentRefreshListener()!= null){
+                    getFragmentRefreshListener().onRefresh();
                 }
-            }).setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-
+                if(getFragmentRefreshListener1()!= null){
+                    getFragmentRefreshListener1().onRefresh();
                 }
+                if (getFragmentRefreshListener2() != null){
+                    getFragmentRefreshListener2().onRefresh();
+                }
+            }).setNegativeButton("cancel", (dialog, which) -> {
+
             });
             builder.create().show();
+        } else if (v.getId() == R.id.popupMenuImageButton){
+            PopupMenu popupMenu = new PopupMenu(MainActivity.this, popupMenuImageButton);
+            popupMenu.getMenuInflater().inflate(R.menu.main_menu, popupMenu.getMenu());
+            popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    if (item.getItemId() == R.id.settingsMenu){
+                        Toast.makeText(getApplicationContext(), "settings", Toast.LENGTH_SHORT).show();
+                    }
+                    return true;
+                }
+            });
+            popupMenu.show();
         }
     }
 
@@ -242,6 +275,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     if (getFragmentRefreshListener2() != null){
                         getFragmentRefreshListener2().onRefresh();
                     }
+                    AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+                    Intent intent = new Intent(this, AlarmReceiver.class);
+                    PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
+                    alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, getTimeInMills(date.getText().toString(), time), AlarmManager.INTERVAL_DAY, pendingIntent);
+//                    Toast.makeText(getApplicationContext(), "" + getTimeInMills(date.getText().toString(), time), Toast.LENGTH_SHORT).show();
 
                 }).setNegativeButton("cancel", (dialog, which) -> {
 
@@ -274,6 +312,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mm = "0" + (m + 1);
         }
         return "" + dd + "." + mm + "." + y;
+    }
+
+    private long getTimeInMills(String date, String time){
+        long timeInMillis = 0;
+        String fullDate = date + " " + time;
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+        try {
+            Date mDate = simpleDateFormat.parse(fullDate);
+            timeInMillis = mDate.getTime();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return timeInMillis;
     }
 
     public FragmentRefreshListener getFragmentRefreshListener() {
