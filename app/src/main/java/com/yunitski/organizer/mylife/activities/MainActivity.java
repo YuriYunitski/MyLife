@@ -7,14 +7,11 @@ import androidx.viewpager.widget.ViewPager;
 
 import android.content.ContentValues;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CalendarView;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -25,7 +22,6 @@ import com.yunitski.organizer.mylife.R;
 import com.yunitski.organizer.mylife.adapters.SectionsPagerAdapter;
 import com.yunitski.organizer.mylife.dbhelper.DbHelper;
 import com.yunitski.organizer.mylife.dbhelper.InputData;
-import com.yunitski.organizer.mylife.fragments.FragmentMorning;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -318,4 +314,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public String getMyData() {
         return date.getText().toString();
     }
+
 }

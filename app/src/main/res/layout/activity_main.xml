@@ -25,7 +25,6 @@
                 android:minHeight="?actionBarSize"
                 android:padding="@dimen/appbar_padding"
                 android:text="@string/app_name"
-                android:layout_weight="1"
                 android:textAppearance="@style/TextAppearance.Widget.AppCompat.Toolbar.Title" />
 
 
@@ -39,6 +38,13 @@
                 android:gravity="end"
                 android:text="01.01.2021"
                 android:textAppearance="@style/TextAppearance.Widget.AppCompat.Toolbar.Title" />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_baseline_more_vert_24"
+                android:background="@drawable/more_background"
+                android:layout_gravity="center"/>
         </LinearLayout>
 
         <com.google.android.material.tabs.TabLayout

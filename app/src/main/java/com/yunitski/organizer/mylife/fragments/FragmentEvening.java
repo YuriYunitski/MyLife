@@ -23,11 +23,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.yunitski.organizer.mylife.R;
 import com.yunitski.organizer.mylife.activities.MainActivity;
-import com.yunitski.organizer.mylife.adapters.DayItemAdapter;
 import com.yunitski.organizer.mylife.adapters.EveningItemAdapter;
 import com.yunitski.organizer.mylife.dbhelper.DbHelper;
 import com.yunitski.organizer.mylife.dbhelper.InputData;
-import com.yunitski.organizer.mylife.itemClasses.DayItem;
 import com.yunitski.organizer.mylife.itemClasses.EveningItem;
 
 import org.jetbrains.annotations.NotNull;
