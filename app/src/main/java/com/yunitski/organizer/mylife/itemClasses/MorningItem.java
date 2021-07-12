@@ -10,14 +10,17 @@ public class MorningItem {
 
     private String morningItemStatus;
 
+    private String morningItemDate;
+
     public MorningItem() {
     }
 
-    public MorningItem(String morningItemId, String morningItemText, String morningItemTime, String morningItemStatus) {
+    public MorningItem(String morningItemId, String morningItemText, String morningItemTime, String morningItemStatus, String morningItemDate) {
         this.morningItemId = morningItemId;
         this.morningItemText = morningItemText;
         this.morningItemTime = morningItemTime;
         this.morningItemStatus = morningItemStatus;
+        this.morningItemDate = morningItemDate;
     }
 
     public String getMorningItemText() {
@@ -50,5 +53,13 @@ public class MorningItem {
 
     public void setMorningItemId(String morningItemId) {
         this.morningItemId = morningItemId;
+    }
+
+    public String getMorningItemDate() {
+        return morningItemDate;
+    }
+
+    public void setMorningItemDate(String morningItemDate) {
+        this.morningItemDate = morningItemDate;
     }
 }

@@ -1,5 +1,6 @@
 package com.yunitski.organizer.mylife.adapters;
 
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -7,6 +8,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.yunitski.organizer.mylife.R;
@@ -47,8 +49,16 @@ public class MorningItemAdapter extends RecyclerView.Adapter<MorningItemAdapter.
     @Override
     public void onBindViewHolder(@NonNull @NotNull MorningItemAdapter.ViewHolder holder, int position) {
         MorningItem morningItem = morningItemList.get(position);
-        holder.itemText.setText(morningItem.getMorningItemText());
-        holder.itemTime.setText(morningItem.getMorningItemTime());
+        if (morningItem.getMorningItemStatus().equals("wait")){
+            holder.itemText.setText(morningItem.getMorningItemText());
+            holder.itemTime.setText(morningItem.getMorningItemTime());
+        } else {
+
+            holder.itemText.setText(morningItem.getMorningItemText());
+            holder.itemTime.setText(morningItem.getMorningItemTime());
+            holder.morningItemMoreButton.setVisibility(View.GONE);
+            holder.morningItemCardView.setCardBackgroundColor(Color.parseColor("#8BCA8E"));
+        }
     }
 
     @Override
@@ -63,6 +73,8 @@ public class MorningItemAdapter extends RecyclerView.Adapter<MorningItemAdapter.
         private final TextView itemTime;
 
         private final ImageButton morningItemMoreButton;
+
+        private final CardView morningItemCardView;
         public ViewHolder(@NonNull @NotNull View itemView) {
             super(itemView);
 
@@ -71,6 +83,8 @@ public class MorningItemAdapter extends RecyclerView.Adapter<MorningItemAdapter.
             itemTime = itemView.findViewById(R.id.morningItemTimeTextView);
 
             morningItemMoreButton = itemView.findViewById(R.id.morningItemMoreButton);
+
+            morningItemCardView = itemView.findViewById(R.id.morningItemCardView);
 
             morningItemMoreButton.setOnClickListener(new View.OnClickListener() {
                 @Override

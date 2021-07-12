@@ -7,9 +7,9 @@
     android:layout_marginEnd="6dp"
     android:layout_height="wrap_content"
     app:cardCornerRadius="14dp"
-    android:id="@+id/morningItemCardView"
+    android:id="@+id/eveningItemCardView"
     app:cardBackgroundColor="#EDFFFD">
-    
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -17,17 +17,17 @@
 
         <TextView
             android:padding="10dp"
-            android:id="@+id/morningItemTextView"
-            android:layout_width="wrap_content"
+            android:id="@+id/eveningItemTextView"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Morning item"
+            android:text="Evening item"
             android:textSize="18sp"
             android:layout_weight="2"
             android:textColor="@color/black"/>
 
         <TextView
             android:padding="6dp"
-            android:id="@+id/morningItemTimeTextView"
+            android:id="@+id/eveningItemTimeTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="00:00"
@@ -37,7 +37,7 @@
             android:textColor="@color/black"/>
 
         <ImageButton
-            android:id="@+id/morningItemMoreButton"
+            android:id="@+id/eveningItemMoreButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_baseline_more_vert_24"
