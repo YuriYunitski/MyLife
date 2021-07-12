@@ -62,10 +62,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         time = timeCurrent();
         date = findViewById(R.id.date);
         date.setText(dateCurrent());
-        SharedPreferences sharedPreferences = getSharedPreferences(DATE_FILE, MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(DATE_KEY, date.getText().toString());
-        editor.apply();
         date.setOnClickListener(this);
         fabMorning.show();
         fabDay.hide();
@@ -89,6 +85,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             }
         });
+        String[] tt = timeCurrent().split(":");
+        if (Integer.parseInt(tt[0]) > 9 && Integer.parseInt(tt[0]) <= 19){
+            TabLayout.Tab tab = tabLayout.getTabAt(1);
+            assert tab != null;
+            tab.select();
+        } else if (Integer.parseInt(tt[0]) > 19 && Integer.parseInt(tt[0]) <= 23){
+            TabLayout.Tab tab = tabLayout.getTabAt(2);
+            assert tab != null;
+            tab.select();
+        } else {
+            TabLayout.Tab tab = tabLayout.getTabAt(0);
+            assert tab != null;
+            tab.select();
+        }
         dbHelper = new DbHelper(this);
     }
 
@@ -116,6 +126,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 fabMorning.hide();
                 fabDay.hide();
                 fabEvening.show();
+                if (getFragmentRefreshListener2() != null){
+                    getFragmentRefreshListener2().onRefresh();
+                }
                 break;
         }
     }
@@ -177,11 +190,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     if(getFragmentRefreshListener()!= null){
                         getFragmentRefreshListener().onRefresh();
                     }
-
                     if(getFragmentRefreshListener1()!= null){
                         getFragmentRefreshListener1().onRefresh();
                     }
-
+                    if (getFragmentRefreshListener2() != null){
+                        getFragmentRefreshListener2().onRefresh();
+                    }
                 }
             }).setNegativeButton("cancel", new DialogInterface.OnClickListener() {
                 @Override
@@ -228,6 +242,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                     if (getFragmentRefreshListener1() != null){
                         getFragmentRefreshListener1().onRefresh();
+                    }
+                    if (getFragmentRefreshListener2() != null){
+                        getFragmentRefreshListener2().onRefresh();
                     }
 
                 }).setNegativeButton("cancel", (dialog, which) -> {
