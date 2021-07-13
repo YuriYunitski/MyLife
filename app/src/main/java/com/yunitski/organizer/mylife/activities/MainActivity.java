@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ViewPager viewPager;
     private TabLayout tabLayout;
     private FloatingActionButton fabMorning, fabDay, fabEvening;
-    private String time, morningTaskText, morningTaskTime;
+    private String time;
     private DbHelper dbHelper;
     private FragmentRefreshListener fragmentRefreshListener;
     private FragmentRefreshListener1 fragmentRefreshListener1;
@@ -253,8 +253,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .setCancelable(false)
                 .setView(view)
                 .setPositiveButton("ok", (dialog, which) -> {
-                    morningTaskText = taskEditText.getText().toString();
-                    morningTaskTime = time;
                     if (!taskEditText.getText().toString().isEmpty()){
                         ContentValues values = new ContentValues();
                         values.put(taskTextColumn, taskEditText.getText().toString());
