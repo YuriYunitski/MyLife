@@ -3,9 +3,11 @@ package com.yunitski.organizer.mylife.activities;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
 import androidx.viewpager.widget.ViewPager;
 
 import android.app.AlarmManager;
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -55,10 +57,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private TextView date;
 
-    public static final String DATE_FILE = "dateFile";
-    public static final String DATE_KEY = "dateKey";
-
     private ImageButton popupMenuImageButton;
+
+
+    public static final String NOTIFICATION_CHANNEL_ID = "10001888" ;
+    private final static String default_notification_channel_id = "default" ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,7 +119,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             tab.select();
         }
         dbHelper = new DbHelper(this);
-        createNotificationChannel();
     }
 
     private void createNotificationChannel() {
@@ -223,14 +225,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else if (v.getId() == R.id.popupMenuImageButton){
             PopupMenu popupMenu = new PopupMenu(MainActivity.this, popupMenuImageButton);
             popupMenu.getMenuInflater().inflate(R.menu.main_menu, popupMenu.getMenu());
-            popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem item) {
-                    if (item.getItemId() == R.id.settingsMenu){
-                        Toast.makeText(getApplicationContext(), "settings", Toast.LENGTH_SHORT).show();
-                    }
-                    return true;
+            popupMenu.setOnMenuItemClickListener(item -> {
+                if (item.getItemId() == R.id.settingsMenu){
+                    startActivity(new Intent(MainActivity.this, SettingsActivity.class));
                 }
+                return true;
             });
             popupMenu.show();
         }
@@ -275,12 +274,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     if (getFragmentRefreshListener2() != null){
                         getFragmentRefreshListener2().onRefresh();
                     }
-                    AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-                    Intent intent = new Intent(this, AlarmReceiver.class);
-                    PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
-                    alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, getTimeInMills(date.getText().toString(), time), AlarmManager.INTERVAL_DAY, pendingIntent);
-//                    Toast.makeText(getApplicationContext(), "" + getTimeInMills(date.getText().toString(), time), Toast.LENGTH_SHORT).show();
+//                    AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+//                    Intent intent = new Intent(this, AlarmReceiver.class);
+//                    PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
+//                    alarmManager.setExact(AlarmManager.RTC_WAKEUP, getTimeInMills(date.getText().toString(), time), pendingIntent);
+//                    alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, getTimeInMills(date.getText().toString(), time), AlarmManager.INTERVAL_DAY, pendingIntent);
+//                    Toast.makeText(getApplicationContext(), "" +(getTimeInMills(date.getText().toString(), time) - getTimeInMills(dateCurrent(), timeCurrent())), Toast.LENGTH_SHORT).show();
 
+                    Intent i = new Intent(getApplicationContext(), MainActivity.class);
+                    PendingIntent pendingIntent2 = PendingIntent.getActivity(getApplicationContext(), (int)(Math.random() * 1000000), i, 0);
+                    scheduleNotification(getNotification(taskEditText.getText().toString(), pendingIntent2), (int) ((new Date().getTime() / 1000L) % Integer.MAX_VALUE), getTimeInMills(date.getText().toString(), time));
                 }).setNegativeButton("cancel", (dialog, which) -> {
 
                 });
@@ -364,6 +367,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
     public String getMyData() {
         return date.getText().toString();
+    }
+
+    private void scheduleNotification (Notification notification , int notificationId, long setTime) {
+        Intent notificationIntent = new Intent( this, AlarmReceiver.class ) ;
+        notificationIntent.putExtra("NOTIFICATION_ID" , notificationId ) ;
+        notificationIntent.putExtra("NOTIFICATION" , notification) ;
+        PendingIntent pendingIntent = PendingIntent. getBroadcast ( this, (int)(Math.random() * 1000000), notificationIntent , PendingIntent. FLAG_UPDATE_CURRENT ) ;
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context. ALARM_SERVICE ) ;
+        assert alarmManager != null;
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP , setTime , pendingIntent);
+    }
+    private Notification getNotification (String content, PendingIntent pendingIntent) {
+        NotificationCompat.Builder builder = new NotificationCompat.Builder( this, default_notification_channel_id ) ;
+        builder.setContentTitle( "It's time!" ) ;
+        builder.setContentText(content) ;
+        builder.setSmallIcon(R.drawable. ic_launcher_foreground ) ;
+        builder.setAutoCancel( true ) ;
+        builder.setChannelId( NOTIFICATION_CHANNEL_ID ) ;
+        builder.setContentIntent(pendingIntent);
+        return builder.build() ;
     }
 
 }
