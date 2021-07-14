@@ -371,7 +371,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Intent notificationIntent = new Intent( this, AlarmReceiver.class ) ;
         notificationIntent.putExtra("NOTIFICATION_ID" , notificationId ) ;
         notificationIntent.putExtra("NOTIFICATION" , notification) ;
-        PendingIntent pendingIntent = PendingIntent. getBroadcast ( this, (int)(Math.random() * 1000000), notificationIntent , PendingIntent. FLAG_UPDATE_CURRENT ) ;
+        PendingIntent pendingIntent = PendingIntent. getBroadcast ( this, (int)(Math.random() * 1000000), notificationIntent , PendingIntent. FLAG_ONE_SHOT ) ;
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context. ALARM_SERVICE ) ;
         assert alarmManager != null;
         alarmManager.setExact(AlarmManager.RTC_WAKEUP , setTime , pendingIntent);
