@@ -75,7 +75,6 @@ public class MorningItem implements Comparable<MorningItem>{
         this.morningItemTimeInMinutes = morningItemTimeInMinutes;
     }
 
-
     @Override
     public int compareTo(MorningItem o) {
         int compareTime = o.getMorningItemTimeInMinutes();

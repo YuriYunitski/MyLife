@@ -12,6 +12,8 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
+
+        <item name="windowActionModeOverlay">true</item>
     </style>
 
     <style name="Theme.MyLife.NoActionBar">
@@ -23,7 +25,4 @@
 
     <style name="Theme.MyLife.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
-    <style name="SwitchTheme" parent="Theme.AppCompat.Light">
-        <item name="android:colorControlActivated">#03A9F4</item>
-    </style>
 </resources>
