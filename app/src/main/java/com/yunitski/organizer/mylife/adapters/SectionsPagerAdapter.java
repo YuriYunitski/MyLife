@@ -13,6 +13,8 @@ import com.yunitski.organizer.mylife.fragments.FragmentEvening;
 import com.yunitski.organizer.mylife.fragments.FragmentDay;
 import com.yunitski.organizer.mylife.R;
 
+import org.jetbrains.annotations.NotNull;
+
 public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
     @StringRes
@@ -24,7 +26,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     }
 
     @Override
-    public Fragment getItem(int position) {
+    public @NotNull Fragment getItem(int position) {
         Fragment fragment = null;
         switch (position){
             case 0:

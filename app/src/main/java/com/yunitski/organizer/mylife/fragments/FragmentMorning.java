@@ -31,6 +31,7 @@ import com.yunitski.organizer.mylife.itemClasses.MorningItem;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class FragmentMorning extends Fragment {
 
@@ -63,6 +64,7 @@ public class FragmentMorning extends Fragment {
         completedMorningItems = new ArrayList<>();
 
         totalMorningItems = new ArrayList<>();
+
         MainActivity activity = (MainActivity) getActivity();
         assert activity != null;
         dd = activity.getMyData();
@@ -77,17 +79,25 @@ public class FragmentMorning extends Fragment {
             int dateIndex = cursor.getColumnIndex(InputData.TaskEntry.COLUMN_MORNING_TASK_DATE);
 
             if (cursor.getString(statusIndex).equals("wait") && cursor.getString(dateIndex).equals(dd)){
-                morningItems.add(new MorningItem(cursor.getString(idIndex), cursor.getString(textIndex), cursor.getString(timeIndex), cursor.getString(statusIndex), cursor.getString(dateIndex)));
+                String[] mit = cursor.getString(timeIndex).split(":");
+                int hour = Integer.parseInt(mit[0]);
+                int min = Integer.parseInt(mit[1]);
+                int tTotal = (hour * 60) + min;
+                morningItems.add(new MorningItem(cursor.getString(idIndex), cursor.getString(textIndex), cursor.getString(timeIndex), cursor.getString(statusIndex), cursor.getString(dateIndex), tTotal));
             } else if (cursor.getString(statusIndex).equals("done") && cursor.getString(dateIndex).equals(dd)){
-                completedMorningItems.add(new MorningItem(cursor.getString(idIndex), cursor.getString(textIndex), cursor.getString(timeIndex), cursor.getString(statusIndex), cursor.getString(dateIndex)));
+                String[] mit = cursor.getString(timeIndex).split(":");
+                int hour = Integer.parseInt(mit[0]);
+                int min = Integer.parseInt(mit[1]);
+                int tTotal = (hour * 60) + min;
+                completedMorningItems.add(new MorningItem(cursor.getString(idIndex), cursor.getString(textIndex), cursor.getString(timeIndex), cursor.getString(statusIndex), cursor.getString(dateIndex), tTotal));
             }
-
         }
         db.close();
         cursor.close();
         LinearLayoutManager layoutManager= new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL, false);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(layoutManager);
+        Collections.sort(morningItems);
         totalMorningItems.addAll(morningItems);
         totalMorningItems.addAll(completedMorningItems);
         adapter = new MorningItemAdapter(totalMorningItems);
@@ -95,6 +105,17 @@ public class FragmentMorning extends Fragment {
         adapter.setOnMorningClickListener(position -> showBottomSheetDialog(morningItems.get(position).getMorningItemText(), position));
 
     }
+
+//    public static void bubbleSort(ArrayList<Integer> timeArr, ArrayList<Integer> indexes) {
+//        int n = timeArr.size();
+//        for (int i = 0; i < n-1; i++)
+//            for (int j = 0; j < n-i-1; j++)
+//                if (timeArr.get(j) > timeArr.get(j + 1)) {
+//                    int temp = timeArr.get(j);
+//                    timeArr.get(j) = timeArr.get(j + 1);
+//                    timeArr[j+1] = temp;
+//                }
+//    }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void showBottomSheetDialog(String name, int position) {

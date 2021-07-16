@@ -21,7 +21,7 @@ import java.util.List;
 
 public class MorningItemAdapter extends RecyclerView.Adapter<MorningItemAdapter.ViewHolder> {
 
-    private List<MorningItem> morningItemList;
+    private final List<MorningItem> morningItemList;
 
     private OnMorningItemClickListener listener;
 
@@ -86,14 +86,11 @@ public class MorningItemAdapter extends RecyclerView.Adapter<MorningItemAdapter.
 
             morningItemCardView = itemView.findViewById(R.id.morningItemCardView);
 
-            morningItemMoreButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (listener != null){
-                        int position = getAdapterPosition();
-                        if (position != RecyclerView.NO_POSITION){
-                            listener.onMorningItemClick(position);
-                        }
+            morningItemMoreButton.setOnClickListener(v -> {
+                if (listener != null){
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION){
+                        listener.onMorningItemClick(position);
                     }
                 }
             });

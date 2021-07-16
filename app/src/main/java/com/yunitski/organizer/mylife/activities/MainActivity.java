@@ -1,6 +1,5 @@
 package com.yunitski.organizer.mylife.activities;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
@@ -8,19 +7,14 @@ import androidx.viewpager.widget.ViewPager;
 
 import android.app.AlarmManager;
 import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.CalendarView;
 import android.widget.EditText;
@@ -28,7 +22,6 @@ import android.widget.ImageButton;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
@@ -46,8 +39,6 @@ import java.util.GregorianCalendar;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private ViewPager viewPager;
-    private TabLayout tabLayout;
     private FloatingActionButton fabMorning, fabDay, fabEvening;
     private String time;
     private DbHelper dbHelper;
@@ -69,8 +60,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager());
-        viewPager = findViewById(R.id.view_pager);
-        tabLayout = findViewById(R.id.tabs);
+        ViewPager viewPager = findViewById(R.id.view_pager);
+        TabLayout tabLayout = findViewById(R.id.tabs);
         viewPager.setAdapter(sectionsPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
         fabMorning = findViewById(R.id.fabMorning);
@@ -105,11 +96,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
         String[] tt = timeCurrent().split(":");
-        if (Integer.parseInt(tt[0]) > 9 && Integer.parseInt(tt[0]) <= 19){
+        if (Integer.parseInt(tt[0]) >= 9 && Integer.parseInt(tt[0]) < 19){
             TabLayout.Tab tab = tabLayout.getTabAt(1);
             assert tab != null;
             tab.select();
-        } else if (Integer.parseInt(tt[0]) > 19 && Integer.parseInt(tt[0]) <= 23){
+        } else if (Integer.parseInt(tt[0]) >= 19 && Integer.parseInt(tt[0]) <= 23){
             TabLayout.Tab tab = tabLayout.getTabAt(2);
             assert tab != null;
             tab.select();
@@ -119,19 +110,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             tab.select();
         }
         dbHelper = new DbHelper(this);
-    }
-
-    private void createNotificationChannel() {
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            CharSequence name = "myLifeReminderChannel";
-            String description = "Channel for alarm Manager";
-            int importance = NotificationManager.IMPORTANCE_HIGH;
-            NotificationChannel channel = new NotificationChannel("myLifeChannelId", name, importance);
-            channel.setDescription(description);
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
-        }
     }
 
     private void animateFab(int position) {
@@ -272,16 +250,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     if (getFragmentRefreshListener2() != null){
                         getFragmentRefreshListener2().onRefresh();
                     }
-//                    AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-//                    Intent intent = new Intent(this, AlarmReceiver.class);
-//                    PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
-//                    alarmManager.setExact(AlarmManager.RTC_WAKEUP, getTimeInMills(date.getText().toString(), time), pendingIntent);
-//                    alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, getTimeInMills(date.getText().toString(), time), AlarmManager.INTERVAL_DAY, pendingIntent);
-//                    Toast.makeText(getApplicationContext(), "" +(getTimeInMills(date.getText().toString(), time) - getTimeInMills(dateCurrent(), timeCurrent())), Toast.LENGTH_SHORT).show();
-
                     Intent i = new Intent(getApplicationContext(), MainActivity.class);
                     PendingIntent pendingIntent2 = PendingIntent.getActivity(getApplicationContext(), (int)(Math.random() * 1000000), i, 0);
-                    scheduleNotification(getNotification(taskEditText.getText().toString(), pendingIntent2), (int) ((new Date().getTime() / 1000L) % Integer.MAX_VALUE), getTimeInMills(date.getText().toString(), time));
+                    SharedPreferences sharedPreferences = getSharedPreferences(SettingsActivity.NOTIFICATION_ENABLE_FILE, Context.MODE_PRIVATE);
+                    boolean isEnabled = sharedPreferences.getBoolean(SettingsActivity.NOTIFICATION_ENABLE_KEY, true);
+                    if (isEnabled){
+                        scheduleNotification(getNotification(taskEditText.getText().toString(), pendingIntent2), (int) ((new Date().getTime() / 1000L) % Integer.MAX_VALUE), getTimeInMills(date.getText().toString(), time));
+                    }
+
                 }).setNegativeButton("cancel", (dialog, which) -> {
 
                 });
@@ -321,6 +297,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
         try {
             Date mDate = simpleDateFormat.parse(fullDate);
+            assert mDate != null;
             timeInMillis = mDate.getTime();
         } catch (ParseException e) {
             e.printStackTrace();
@@ -380,7 +357,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         NotificationCompat.Builder builder = new NotificationCompat.Builder( this, default_notification_channel_id ) ;
         builder.setContentTitle( "It's time!" ) ;
         builder.setContentText(content) ;
-        builder.setSmallIcon(R.drawable. ic_launcher_foreground ) ;
+        builder.setSmallIcon(R.mipmap.ic_launcher) ;
         builder.setAutoCancel( true ) ;
         builder.setChannelId( NOTIFICATION_CHANNEL_ID ) ;
         builder.setContentIntent(pendingIntent);

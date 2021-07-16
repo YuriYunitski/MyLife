@@ -21,7 +21,7 @@ import java.util.List;
 
 public class DayItemAdapter extends RecyclerView.Adapter<DayItemAdapter.ViewHolder> {
 
-    private List<DayItem> dayItemList;
+    private final List<DayItem> dayItemList;
 
     private OnDayItemClickListener listener;
 
@@ -85,14 +85,11 @@ public class DayItemAdapter extends RecyclerView.Adapter<DayItemAdapter.ViewHold
 
             dayItemCardView = itemView.findViewById(R.id.dayItemCardView);
 
-            dayItemMoreButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (listener != null){
-                        int position = getAdapterPosition();
-                        if (position != RecyclerView.NO_POSITION){
-                            listener.onDayItemClick(position);
-                        }
+            dayItemMoreButton.setOnClickListener(v -> {
+                if (listener != null){
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION){
+                        listener.onDayItemClick(position);
                     }
                 }
             });

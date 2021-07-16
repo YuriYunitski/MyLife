@@ -1,6 +1,6 @@
 package com.yunitski.organizer.mylife.itemClasses;
 
-public class EveningItem {
+public class EveningItem implements Comparable<EveningItem>{
 
     private String eveningItemId;
 
@@ -12,12 +12,15 @@ public class EveningItem {
 
     private String eveningItemDate;
 
-    public EveningItem(String eveningItemId, String eveningItemText, String eveningItemTime, String eveningItemStatus, String eveningItemDate) {
+    private int eveningItemTimeInMinutes;
+
+    public EveningItem(String eveningItemId, String eveningItemText, String eveningItemTime, String eveningItemStatus, String eveningItemDate, int eveningItemTimeInMinutes) {
         this.eveningItemId = eveningItemId;
         this.eveningItemText = eveningItemText;
         this.eveningItemTime = eveningItemTime;
         this.eveningItemStatus = eveningItemStatus;
         this.eveningItemDate = eveningItemDate;
+        this.eveningItemTimeInMinutes = eveningItemTimeInMinutes;
     }
 
     public String getEveningItemId() {
@@ -58,5 +61,19 @@ public class EveningItem {
 
     public void setEveningItemDate(String eveningItemDate) {
         this.eveningItemDate = eveningItemDate;
+    }
+
+    public int getEveningItemTimeInMinutes() {
+        return eveningItemTimeInMinutes;
+    }
+
+    public void setEveningItemTimeInMinutes(int eveningItemTimeInMinutes) {
+        this.eveningItemTimeInMinutes = eveningItemTimeInMinutes;
+    }
+
+    @Override
+    public int compareTo(EveningItem o) {
+        int compareTime = o.getEveningItemTimeInMinutes();
+        return this.eveningItemTimeInMinutes-compareTime;
     }
 }

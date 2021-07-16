@@ -12,7 +12,6 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.yunitski.organizer.mylife.R;
-import com.yunitski.organizer.mylife.itemClasses.DayItem;
 import com.yunitski.organizer.mylife.itemClasses.EveningItem;
 
 import org.jetbrains.annotations.NotNull;
@@ -22,7 +21,7 @@ import java.util.List;
 
 public class EveningItemAdapter extends RecyclerView.Adapter<EveningItemAdapter.ViewHolder> {
 
-    private List<EveningItem> eveningItemList;
+    private final List<EveningItem> eveningItemList;
 
     private OnEveningItemClickListener listener;
 
@@ -86,14 +85,11 @@ public class EveningItemAdapter extends RecyclerView.Adapter<EveningItemAdapter.
 
             eveningItemCardView = itemView.findViewById(R.id.eveningItemCardView);
 
-            eveningItemMoreButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (listener != null){
-                        int position = getAdapterPosition();
-                        if (position != RecyclerView.NO_POSITION){
-                            listener.onEveningItemClick(position);
-                        }
+            eveningItemMoreButton.setOnClickListener(v -> {
+                if (listener != null){
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION){
+                        listener.onEveningItemClick(position);
                     }
                 }
             });

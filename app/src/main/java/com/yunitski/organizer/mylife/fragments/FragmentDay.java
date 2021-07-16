@@ -31,6 +31,7 @@ import com.yunitski.organizer.mylife.itemClasses.DayItem;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class FragmentDay extends Fragment {
 
@@ -75,9 +76,17 @@ public class FragmentDay extends Fragment {
             int dateIndex = cursor.getColumnIndex(InputData.TaskEntry.COLUMN_DAY_TASK_DATE);
 
             if (cursor.getString(statusIndex).equals("wait") && cursor.getString(dateIndex).equals(dd)){
-                dayItems.add(new DayItem(cursor.getString(idIndex), cursor.getString(textIndex), cursor.getString(timeIndex), cursor.getString(statusIndex), cursor.getString(dateIndex)));
+                String[] mit = cursor.getString(timeIndex).split(":");
+                int hour = Integer.parseInt(mit[0]);
+                int min = Integer.parseInt(mit[1]);
+                int tTotal = (hour * 60) + min;
+                dayItems.add(new DayItem(cursor.getString(idIndex), cursor.getString(textIndex), cursor.getString(timeIndex), cursor.getString(statusIndex), cursor.getString(dateIndex), tTotal));
             } else if (cursor.getString(statusIndex).equals("done") && cursor.getString(dateIndex).equals(dd)){
-                completedDayItems.add(new DayItem(cursor.getString(idIndex), cursor.getString(textIndex), cursor.getString(timeIndex), cursor.getString(statusIndex), cursor.getString(dateIndex)));
+                String[] mit = cursor.getString(timeIndex).split(":");
+                int hour = Integer.parseInt(mit[0]);
+                int min = Integer.parseInt(mit[1]);
+                int tTotal = (hour * 60) + min;
+                completedDayItems.add(new DayItem(cursor.getString(idIndex), cursor.getString(textIndex), cursor.getString(timeIndex), cursor.getString(statusIndex), cursor.getString(dateIndex), tTotal));
             }
 
         }
@@ -87,6 +96,7 @@ public class FragmentDay extends Fragment {
         LinearLayoutManager layoutManager= new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL, false);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(layoutManager);
+        Collections.sort(dayItems);
         totalDayItems.addAll(dayItems);
         totalDayItems.addAll(completedDayItems);
         adapter = new DayItemAdapter(totalDayItems);
