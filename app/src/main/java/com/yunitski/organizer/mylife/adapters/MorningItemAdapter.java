@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
@@ -81,16 +82,17 @@ public class MorningItemAdapter extends RecyclerView.Adapter<MorningItemAdapter.
     @Override
     public void onBindViewHolder(@NonNull @NotNull MorningItemAdapter.ViewHolder holder, int position) {
         MorningItem morningItem = morningItemList.get(position);
-        if (morningItem.getMorningItemStatus().equals("wait")){
-            holder.itemText.setText(morningItem.getMorningItemText());
-            holder.itemTime.setText(morningItem.getMorningItemTime());
-        } else {
-
-            holder.itemText.setText(morningItem.getMorningItemText());
-            holder.itemTime.setText(morningItem.getMorningItemTime());
-            holder.morningItemMoreButton.setVisibility(View.GONE);
-            holder.morningItemCardView.setCardBackgroundColor(Color.parseColor("#8BCA8E"));
-        }
+//        if (morningItem.getMorningItemStatus().equals("wait")){
+//            holder.itemText.setText(morningItem.getMorningItemText());
+//            holder.itemTime.setText(morningItem.getMorningItemTime());
+//        } else {
+//
+//            holder.itemText.setText(morningItem.getMorningItemText());
+//            holder.itemTime.setText(morningItem.getMorningItemTime());
+//            holder.morningItemMoreButton.setVisibility(View.GONE);
+//            holder.morningItemCardView.setCardBackgroundColor(Color.parseColor("#8BCA8E"));
+//        }
+        holder.update(morningItem);
     }
 
     @Override
@@ -122,14 +124,6 @@ public class MorningItemAdapter extends RecyclerView.Adapter<MorningItemAdapter.
 
             morningItemLinearLayout = itemView.findViewById(R.id.morningItemLinearLayout);
 
-            morningItemMoreButton.setOnClickListener(v -> {
-                if (listener != null){
-                    int position = getAdapterPosition();
-                    if (position != RecyclerView.NO_POSITION){
-                        listener.onMorningItemClick(position);
-                    }
-                }
-            });
 
 
         }
@@ -161,6 +155,35 @@ public class MorningItemAdapter extends RecyclerView.Adapter<MorningItemAdapter.
                 morningItemMoreButton.setVisibility(View.GONE);
                 morningItemCardView.setCardBackgroundColor(Color.parseColor("#8BCA8E"));
             }
+            if (selectedList.contains(morningItem)){
+                morningItemCardView.setCardBackgroundColor(Color.LTGRAY);
+            } else {
+                if (morningItem.getMorningItemStatus().equals("wait")){
+                    morningItemCardView.setCardBackgroundColor(Color.parseColor("#EDFFFD"));
+                } else {
+                    morningItemCardView.setCardBackgroundColor(Color.parseColor("#8BCA8E"));
+                }
+            }
+            morningItemCardView.setOnLongClickListener(v -> {
+                ((AppCompatActivity)v.getContext()).startSupportActionMode(actionModeCallbacks);
+                selectItem(morningItem);
+                return true;
+            });
+
+            morningItemMoreButton.setOnClickListener(v -> {
+                if (multiSelect){
+                    selectItem(morningItem);
+                } else {
+                    if (listener != null){
+                        int position = getAdapterPosition();
+                        if (position != RecyclerView.NO_POSITION){
+                            listener.onMorningItemClick(position);
+                        }
+                    }
+                }
+
+            });
+
         }
     }
 }
